@@ -16,10 +16,11 @@ function generateToken(params = {}) {
 
 router.post('/register', async (req, res) => {
     const { email } = req.body;
+console.log(JSON.stringify(req.body))
 
     try {
         if(await User.findOne({ email }))
-            return res.status(400).send({ error: 'Usuario já existente'});
+            return res.status(400).send({ error: 'Usuario já existente', logado: false});
 
         const user = await User.create(req.body);
 
@@ -27,28 +28,30 @@ router.post('/register', async (req, res) => {
 
         return res.send({
              user,
+             logado: true,
              token: generateToken({ id: user.id }),
          });
     } catch (err) {
-        return res.status(400).send({ error: 'Falha no Registro'});
+        return res.status(400).send({ error: 'Falha no Registro', logado: false});
     }
 });
 
 router.post('/authenticate', async (req, res) => {
-    const { email, password} = req.body;
+    const { email, password } = req.body;
 
-    const user = await user.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select('+password');
 
     if(!user)
-        return res.status(400).send({ error: 'Usuario não encontrado'});
+        return res.status(400).send({ error: 'Usuario não encontrado', logado: false});
 
     if(!await bcrypt.compare(password, user.password))
-        return res.status(400).send({ error: 'senha Invalida'})   
+        return res.status(400).send({ error: 'senha Invalida', logado: false})   
 
     user.password = undefined;    
 
     res.send({ 
         user, 
+        logado: true,
         token: generateToken({ id: user.id }),
      });    
 });

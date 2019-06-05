@@ -1,6 +1,8 @@
 const mongoose = require('../database');
 const bcrypt = require('bcryptjs') 
 
+//criação das tabelas e criptografia da senha
+
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
